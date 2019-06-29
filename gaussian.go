@@ -25,17 +25,9 @@ func stdDuration(m time.Duration, d time.Duration) time.Duration {
 // The duration for timer to trigger isn't fully defined.
 // It is a Gaussian distribution with mean and standard deviation.
 func NewGaussian(mean time.Duration, stddev time.Duration) *Gaussian {
-	c := make(chan time.Time, 1)
-
-	t := time.AfterFunc(stdDuration(mean, stddev), func() {
-		select {
-		case c <- time.Now():
-		default:
-		}
-	})
-
+	t := time.NewTimer(stdDuration(mean, stddev))
 	return &Gaussian{
-		C:        c,
+		C:        t.C,
 		t:        t,
 		lastMean: mean,
 		lastDev:  stddev,
